@@ -2,7 +2,11 @@
 
 void Tron::Tron()
 {
-  
+  iGlobal = 0;
+  jGlobal = 0;
+  kGlobal = 0;
+
+  NewAnimation = false;
 }
 
 void Tron::~Tron()
@@ -15,7 +19,7 @@ void Tron::init(int LED_COUNT, int LED_PIN,  int SFX_TX, int SFX_RX, int SFX_RST
   Audio_Serial = SoftwareSerial(SFX_TX, SFX_RX);
   SFX = Adafruit_Soundboard(&Audio_Serial, NULL, SFX_RST);
 
-  Audio_Serial.begin(9600);
+  Audio_Serial.begin(115200);
 
   // Set up BLE peripheral for Blynk
   blePeripheral.setLocalName("TRON_101");
@@ -149,6 +153,63 @@ void Tron::Rainbow()
   }
 }
 
+void Tron::RainbowBreath()
+{
+  for (int c = RED_PXL; c <= PURPLE_PXL; c++)
+  {
+    for(int j = 0; j < 256; j++)
+    {
+      for(uint16_t i = 0; i < pixels.numPixels(); i++) 
+        pixels.setPixelColor(i, Color_List[c]);
+      
+      pixels.show();
+      pixels.setBrightness(j);
+      fps_alt();
+    }
+
+    for(int j = 255; j > 0; j--)
+    {
+      for(uint16_t i = 0; i < pixels.numPixels(); i++) 
+        pixels.setPixelColor(i, Color_List[c]);
+      
+      pixels.show();
+      pixels.setBrightness(j);
+      fps_alt();
+    } 
+  }
+
+}
+
+void Tron::RainbowStrip()
+{
+  for (int i = 0; i < 256; i++)
+  {
+    for (int j = 0; j < LED_COUNT; j++)
+    {
+      for (int k = 0; k < LED_COUNT; k++)
+        {
+          pixels.setPixelColor(k, wheel((i+j) & 255));
+        }
+    }
+    pixels.show();
+    fps_alt();
+  }
+
+}
+
+void Tron::RainbowColorWipe()
+{
+  for (int i = RED_PXL; i <= PURPLE_PXL; i++)
+  {
+    for (int j = 0; j < pixels.numPixels(); j++)
+    {
+      pixels.setPixelColor(j, i);
+      pixels.show();
+      fps_alt();
+    }
+  }
+}
+
 void Tron::TheaterChaseRainbow()
 {
   for (int i = 0; i < 256; i++)
@@ -179,7 +240,18 @@ void Tron::Streak(uint32_t c)
 
 void Tron::ColorWipe(uint32_t c)
 {
-  
+  for (int i = 0; i < pixels.numPixels(); i++)
+  {
+    pixels.setPixelColor(i, c);
+    pixels.show();
+    fps_alt();
+  }
+  for (int i = 0; i < pixels.numPixels(); i++)
+  {
+    pixels.setPixelColor(i, Color_List[BLACK_PXL]);
+    pixels.show();
+    fps_alt();
+  }
 }
 
 void Tron::flushInput() {

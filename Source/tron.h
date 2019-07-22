@@ -95,6 +95,13 @@ public:
     pixels.Color(255, 255, 255),
   };
 
+  bool NewAnimation;
+  int iGlobal;
+  int jGlobal;
+  int kGlobal;
+
+  int Speed;
+
 public:
   // Animations
   uint32_t wheel(int);
@@ -103,10 +110,11 @@ public:
   void Streak(uint32_t);
   void StreakGPS(uint32_t);
   void ColorWipe(uint32_t);
-  void BreathRGB();
   
   void Rainbow();
+  void RainbowStrip();
   void RainbowBreath();
+  void RainbowColorWipe();
   void TheaterChaseRainbow();
   
 };

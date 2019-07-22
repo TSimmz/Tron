@@ -111,6 +111,12 @@ BLYNK_WRITE(V12)
 {
   Tron.SFX.playTrack((uint8_t)4);
 }
+
+BLYNK_WRITE(V13)
+{
+  Tron.Speed = GPS.getSpeed();
+}
+
 //======================================================
 
 
