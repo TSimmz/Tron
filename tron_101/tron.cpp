@@ -1,15 +1,15 @@
 #include "tron.h"
 
-void Tron::Tron()
+Tron::Tron()
 {
-  iGlobal = 0;
-  jGlobal = 0;
-  kGlobal = 0;
-
-  NewAnimation = false;
+//  LoopVar[iGlobal] = 0;
+//  LoopVar[jGlobal] = 0;
+//  LoopVar[kGlobal] = 0;
+//
+//  NewAnimation = false;
 }
 
-void Tron::~Tron()
+Tron::~Tron()
 {
   
 }
@@ -19,7 +19,7 @@ void Tron::init(int LED_COUNT, int LED_PIN,  int SFX_TX, int SFX_RX, int SFX_RST
   Audio_Serial = SoftwareSerial(SFX_TX, SFX_RX);
   SFX = Adafruit_Soundboard(&Audio_Serial, NULL, SFX_RST);
 
-  Audio_Serial.begin(115200);
+  Audio_Serial.begin(9600);
 
   // Set up BLE peripheral for Blynk
   blePeripheral.setLocalName("TRON_101");
@@ -41,9 +41,9 @@ void Tron::run()
   blePeripheral.poll();
   Blynk.run();
   
-  if (POWR == ON)
+  if (Status[Power] == ON)
   {
-    switch(ANIM)
+    switch(Status[Animation])
     {
       case SOLID:
         Solid(Color_List[ColorType]);
@@ -72,11 +72,11 @@ void Tron::init_blynk()
     else if (i == Speed)
       Status[i] = DEFAULT_FPS;
     else
-      Status[i] = DEFAULT_VAL;
+      Status[i] = DEFAULT_VALUE;
   }
   
   Blynk.virtualWrite(V0, Status[Power]);
-  Blynk.virtualWrite(V1, Status[Red], Status[Grn], Status[Blu]);
+  Blynk.virtualWrite(V1, Status[zRed], Status[zGrn], Status[zBlu]);
   Blynk.virtualWrite(V2, Status[Brightness]);
   Blynk.virtualWrite(V3, Status[Speed]);
   Blynk.virtualWrite(V5, Status[Init]);
@@ -87,7 +87,7 @@ void Tron::init_blynk()
 
 void Tron::init_LoopVars(int func)
 {
-  if (func == NORM)
+  if (func == 0)
   {
     LoopVar[iGlobal] = 0;
     LoopVar[jGlobal] = 0;
@@ -208,9 +208,9 @@ void Tron::RainbowStrip()
 {
   for (int i = 0; i < 256; i++)
   {
-    for (int j = 0; j < LED_COUNT; j++)
+    for (int j = 0; j < pixels.numPixels(); j++)
     {
-      for (int k = 0; k < LED_COUNT; k++)
+      for (int k = 0; k < pixels.numPixels(); k++)
         {
           pixels.setPixelColor(k, wheel((i+j) & 255));
         }

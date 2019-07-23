@@ -1,3 +1,14 @@
 Tron	KEYWORD2
 init	KEYWORD2
 run		KEYWORD2
+init_blynk	KEYWORD2
+Solid	KEYWORD2
+Breath	KEYWORD2
+Streak	KEYWORD2
+StreakGPS	KEYWORD2
+ColorWipe	KEYWORD2
+Rainbow	KEYWORD2
+RainbowStrip	KEYWORD2
+RainbowBreath	KEYWORD2
+RainbowColorWipe	KEYWORD2
+TheaterChaseRainbow	KEYWORD2

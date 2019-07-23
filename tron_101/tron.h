@@ -17,6 +17,8 @@
 #define ON  1
 #define OFF 0
 
+char auth[]="RhyEuIrXcuzWXikp8Pq2lJlQox1JTkoZ";
+
 typedef enum
 {
   Power     ,
@@ -61,8 +63,8 @@ typedef enum
   BLUE_PXL      ,
   MAGENTA_PXL   ,
   PURPLE_PXL    ,
-  WHITE_PXL     , 
-  
+  WHITE_PXL     ,
+  COLOR_COUNT   ,  
 } _Colors;
 
 typedef enum
@@ -71,7 +73,7 @@ typedef enum
   jGlobal,
   kGlobal,
   LOOPVAR_COUNT
-} _LoopVars
+} _LoopVars;
 
 class Tron
 {
@@ -80,24 +82,28 @@ public:
   Tron();
   ~Tron();
 
-  void init();
+  void init(int, int, int, int, int);
   void run();
   
   void init_blynk();
 
   void init_LoopVars(int func);
+  void flushInput();
 
-private:
+  void fps();
+  void fps_alt();
+
+public:
   Adafruit_NeoPixel pixels;
   BLEPeripheral blePeripheral;
-  SoftwareSerial Audio_Serial;
+  SoftwareSerial Audio_Serial = SoftwareSerial();
   Adafruit_Soundboard SFX;
 
 public:
   int Status[STATUS_COUNT];
   int LoopVar[LOOPVAR_COUNT];
 
-  uint32_t Color_List[] = 
+  uint32_t Color_List[COLOR_COUNT] = 
   {
     pixels.Color(0  , 0  , 0  ),
     pixels.Color(0  , 0  , 0  ),
@@ -114,6 +120,8 @@ public:
 
   bool NewAnimation;
 
+  char * auth;
+  
 public:
   // Animations
   uint32_t wheel(int);
