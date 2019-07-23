@@ -22,26 +22,31 @@ typedef enum
   Power     ,
   Init      ,
   Animation ,
-  mColor    ,
+  ColorType ,
   Brightness,
   Speed     ,
+  SpeedGPS  ,
   zRed      ,
   zGrn      ,
   zBlu      ,
-  Red       ,
-  Grn       ,
-  Blu       ,
   STATUS_COUNT,
      
 } _Status_Vals;
 
 typedef enum
 {
-  SOLID   = 0,
-  BREATH  = 1,
-  RAINBOW = 2,
-  THEATER_RAINBOW = 3,
-  
+  SOLID           ,
+  BREATH          ,
+  STREAK          ,
+  STREAKGPS       ,
+  COLORWIPE       ,
+  THEATERCHASE    ,
+  RAINBOW         ,
+  RAINBOWSTRIP    ,
+  RAINBOWBREATH   ,
+  RAINBOWCOLORWIPE,
+  THEATER_RAINBOW ,
+  ANIMATION_COUNT ,
 } _Animation;
 
 typedef enum
@@ -60,6 +65,14 @@ typedef enum
   
 } _Colors;
 
+typedef enum
+{
+  iGlobal,
+  jGlobal,
+  kGlobal,
+  LOOPVAR_COUNT
+} _LoopVars
+
 class Tron
 {
   
@@ -72,6 +85,8 @@ public:
   
   void init_blynk();
 
+  void init_LoopVars(int func);
+
 private:
   Adafruit_NeoPixel pixels;
   BLEPeripheral blePeripheral;
@@ -80,6 +95,8 @@ private:
 
 public:
   int Status[STATUS_COUNT];
+  int LoopVar[LOOPVAR_COUNT];
+
   uint32_t Color_List[] = 
   {
     pixels.Color(0  , 0  , 0  ),
@@ -96,15 +113,11 @@ public:
   };
 
   bool NewAnimation;
-  int iGlobal;
-  int jGlobal;
-  int kGlobal;
-
-  int Speed;
 
 public:
   // Animations
   uint32_t wheel(int);
+
   void Solid(uint32_t);
   void Breath(uint32_t);
   void Streak(uint32_t);

@@ -46,10 +46,10 @@ void Tron::run()
     switch(ANIM)
     {
       case SOLID:
-        Solid(COLORS[COLO]);
+        Solid(Color_List[ColorType]);
         break;
       case BREATH:
-        Breath(COLORS[COLO]);
+        Breath(Color_List[ColorType]);
         break;
       case RAINBOW:
         Rainbow();
@@ -60,7 +60,7 @@ void Tron::run()
     }
   }
   else
-    Solid(COLORS[BLACK_PXL]);
+    Solid(Color_List[BLACK_PXL]);
 }
 
 void Tron::init_blynk()
@@ -81,7 +81,22 @@ void Tron::init_blynk()
   Blynk.virtualWrite(V3, Status[Speed]);
   Blynk.virtualWrite(V5, Status[Init]);
   Blynk.virtualWrite(V6, Status[Animation]);
-  Blynk.virtualWrite(V7, Status[mColor]);
+  Blynk.virtualWrite(V7, Status[ColorType]);
+
+}
+
+void Tron::init_LoopVars(int func)
+{
+  if (func == NORM)
+  {
+    LoopVar[iGlobal] = 0;
+    LoopVar[jGlobal] = 0;
+    LoopVar[kGlobal] = 0;
+  }
+  else
+  {
+
+  }
 
 }
 
@@ -113,7 +128,8 @@ void Tron::Breath(uint32_t c)
     pixels.show();
     pixels.setBrightness(j);
     fps_alt();
-  }
+  } 
+  
   for(int j = 255; j > 0; j--)
   {
     for(uint16_t i = 0; i < pixels.numPixels(); i++) 
@@ -142,14 +158,22 @@ uint32_t Tron::wheel(int pos)
 
 void Tron::Rainbow()
 {
-  for (int i = 0; i < 256; i++)
+  if (NewAnimation)
+    init_LoopVars(0);
+
+  if (LoopVar[iGlobal] < 256)
   {
-    for (int j = 0; j < LED_COUNT; j++)
-    {
-      pixels.setPixelColor(j, wheel((i+j) & 255));
-    }
+    for (int j = 0; j < pixels.numPixels(); j++)
+      pixels.setPixelColor(j, wheel((LoopVar[iGlobal]+j) & 255));
+    
     pixels.show();
     fps_alt();
+
+    LoopVar[iGlobal]++;
+  }
+  else
+  {
+    LoopVar[iGlobal] = 0;
   }
 }
 
