@@ -18,6 +18,7 @@ void Tron::init()
   mPreviousAnimation = -1;
   
   mBreathStatus = 0;
+  mWipeStatus = 0;
 
   // Start Neopixel strip
   pixels.begin();
@@ -28,12 +29,12 @@ void Tron::run()
 {  
   if (Status[Power] == ON)
   {
-	mCurrentAnimation = Status[Animation];
-	if (mPreviousAnimation != mCurrentAnimation)
-	{
-		init_LoopVars();
-		mPreviousAnimation = mCurrentAnimation;
-	}
+	  mCurrentAnimation = Status[Animation];
+	  if (mPreviousAnimation != mCurrentAnimation)
+  	{
+  		init_LoopVars();
+  		mPreviousAnimation = mCurrentAnimation;
+  	}
 	
     switch(Status[Animation])
     {
@@ -90,7 +91,7 @@ void Tron::init_LoopVars()
   }
   else
   {
-	LoopVar[iGlobal] = 0;
+	  LoopVar[iGlobal] = 0;
     LoopVar[jGlobal] = 0;
     LoopVar[kGlobal] = 0;
   }
@@ -147,6 +148,12 @@ void Tron::SetStrip(uint32_t c)
 		pixels.setPixelColor(i, c);
 }
 
+void Tron::SetStripSection(uint32_t c, int s, int e)
+{
+  for(uint16_t i = s; i < e; i++) 
+    pixels.setPixelColor(i, c);
+}
+
 /// Sets the NeoPixel strip one color
 void Tron::Solid(uint32_t c)
 {
@@ -190,6 +197,35 @@ void Tron::Breath(uint32_t c)
   		  LoopVar[iGlobal]--;
   	}
   }  
+}
+
+void Tron::ColorWipe(uint32_t c)
+{
+  int index = LoopVar[iGlobal]++;
+  
+  if (mWipeStatus == 0)
+  {
+    SetStripSection(c, 0, index);
+    pixels.show();
+
+    if (index == pixels.numPixels())
+    {
+      mWipeStatus = 1;
+      LoopVar[iGlobal] = 0;
+    }
+  }
+
+  else if (mWipeStatus == 1)
+  {
+    SetStripSection(Color_List[BLACK_PXL], 0, index);
+    pixels.show();
+
+    if (index == pixels.numPixels())
+    {
+      mWipeStatus = 0;
+      LoopVar[iGlobal] = 0;
+    }
+  }
 }
 
 void Tron::TheaterChase(uint32_t c)
@@ -311,21 +347,7 @@ void Tron::StreakGPS(uint32_t c)
   }
 }
 
-void Tron::ColorWipe(uint32_t c)
-{
-  for (int i = 0; i < pixels.numPixels(); i++)
-  {
-    pixels.setPixelColor(i, c);
-    pixels.show();
-    fps_alt();
-  }
-  for (int i = 0; i < pixels.numPixels(); i++)
-  {
-    pixels.setPixelColor(i, Color_List[BLACK_PXL]);
-    pixels.show();
-    fps_alt();
-  }
-}
+
 
 void Tron::flushInput() {
   // Read all available serial input to flush pending data.

@@ -98,6 +98,7 @@ public:
   void fps_alt();
 
   void SetStrip(uint32_t);
+  void SetStripSection(uint32_t, int, int);
 
 public:
   Adafruit_NeoPixel pixels = Adafruit_NeoPixel(LED_COUNT, LED_PIN, WS2812_CHIPSET);
@@ -128,6 +129,7 @@ public:
   int mPreviousAnimation;
   
   int mBreathStatus;
+  int mWipeStatus;
   
 public:
   // Animations
