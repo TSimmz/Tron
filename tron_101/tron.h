@@ -135,10 +135,11 @@ public:
   // Animations
   uint32_t wheel(int);
   uint32_t getColor(int);
+  void FadeToBlack(int, byte);
 
   void Solid(uint32_t);
   void Breath(uint32_t);
-  void Streak(uint32_t);
+  void Streak(uint32_t, uint8_t, uint8_t, bool);
   void StreakGPS(uint32_t);
   void ColorWipe(uint32_t);
   void TheaterChase(uint32_t);

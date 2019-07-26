@@ -45,7 +45,7 @@ void Tron::run()
       Breath(getColor(Status[ColorType]));
       break;
 	  case STREAK:
-	    Streak(getColor(Status[ColorType]));
+	    Streak(getColor(Status[ColorType]), 10, 64, true);
 		  break;
 	  case STREAKGPS:
 	    StreakGPS(getColor(Status[ColorType]));
@@ -142,6 +142,24 @@ uint32_t Tron::getColor(int index)
   }
 }
 
+void Tron::FadeToBlack(int ledNo, byte fadeValue) 
+{
+    uint32_t oldColor;
+    uint8_t r, g, b;
+    
+    oldColor = pixels.getPixelColor(ledNo);
+    
+    r = (oldColor & 0x00ff0000UL) >> 16;
+    g = (oldColor & 0x0000ff00UL) >> 8;
+    b = (oldColor & 0x000000ffUL);
+
+    r = (r <= 10) ? 0 : (int) r - (r * fadeValue/256);
+    g = (g <= 10) ? 0 : (int) g - (g * fadeValue/256);
+    b = (b <= 10) ? 0 : (int) b - (b * fadeValue/256);
+    
+    pixels.setPixelColor(ledNo, pixels.Color(r, g, b));
+}
+
 void Tron::SetStrip(uint32_t c)
 {
 	for(uint16_t i = 0; i < pixels.numPixels(); i++) 
@@ -197,6 +215,43 @@ void Tron::Breath(uint32_t c)
   		  LoopVar[iGlobal]--;
   	}
   }  
+}
+
+void Tron::Streak(uint32_t c, uint8_t mSize, uint8_t mTrailDecay, bool mRandDecay)
+{
+  SetStrip(Color_List[BLACK_PXL]);
+  
+  for(int i = 0; i < pixels.numPixels() * 2; i++) {
+    
+    // fade brightness all LEDs one step
+    for(int j = 0; j < pixels.numPixels(); j++)
+    {
+      if( (!mRandDecay) || (random(10) > 5) ) 
+      {
+        FadeToBlack(j, mTrailDecay );        
+      }
+    }
+    
+    // draw meteor
+    for(int j = 0; j < mSize; j++) 
+    {
+      if((i - j < pixels.numPixels()) && (i - j >= 0) ) 
+      {
+        pixels.setPixelColor(i-j, c);
+      } 
+    }
+   
+    pixels.show();
+    delay(10);
+  }
+}
+
+void Tron::StreakGPS(uint32_t c)
+{
+  for (int i = 0; i < pixels.numPixels(); i++)
+  {
+    
+  }
 }
 
 void Tron::ColorWipe(uint32_t c)
@@ -331,21 +386,7 @@ void Tron::TheaterChaseRainbow()
   }
 }
 
-void Tron::Streak(uint32_t c)
-{
-  for (int i = 0; i < pixels.numPixels(); i++)
-  {
-    
-  }
-}
 
-void Tron::StreakGPS(uint32_t c)
-{
-  for (int i = 0; i < pixels.numPixels(); i++)
-  {
-    
-  }
-}
 
 
 
