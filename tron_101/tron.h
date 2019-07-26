@@ -1,8 +1,7 @@
 #ifndef TRON_H
 #define TRON_H
 
-#include <BlynkSimpleCurieBLE.h>
-#include <CurieBLE.h>
+
 #include <SoftwareSerial.h>
 #include <Adafruit_Soundboard.h>
 #include <Adafruit_NeoPixel.h>
@@ -14,10 +13,17 @@
 #define DEFAULT_BRIGHT    127
 #define DEFAULT_FPS       60
 
+#define SFX_RX 4
+#define SFX_TX 5
+#define SFX_RST 6
+
+#define LED_PIN             7
+#define LED_COUNT           50
+
 #define ON  1
 #define OFF 0
 
-char auth[]="RhyEuIrXcuzWXikp8Pq2lJlQox1JTkoZ";
+
 
 typedef enum
 {
@@ -37,7 +43,7 @@ typedef enum
 
 typedef enum
 {
-  SOLID           ,
+  SOLID = 0       ,
   BREATH          ,
   STREAK          ,
   STREAKGPS       ,
@@ -82,22 +88,22 @@ public:
   Tron();
   ~Tron();
 
-  void init(int, int, int, int, int);
+  void init();
   void run();
   
-  void init_blynk();
-
-  void init_LoopVars(int func);
+  void init_LoopVars();
   void flushInput();
 
   void fps();
   void fps_alt();
 
+  void SetStrip(uint32_t);
+
 public:
-  Adafruit_NeoPixel pixels;
-  BLEPeripheral blePeripheral;
-  SoftwareSerial Audio_Serial = SoftwareSerial();
-  Adafruit_Soundboard SFX;
+  Adafruit_NeoPixel pixels = Adafruit_NeoPixel(LED_COUNT, LED_PIN, WS2812_CHIPSET);
+  
+  SoftwareSerial Audio_Serial = SoftwareSerial(SFX_TX, SFX_RX);
+  Adafruit_Soundboard SFX = Adafruit_Soundboard(&Audio_Serial, NULL, SFX_RST);
 
 public:
   int Status[STATUS_COUNT];
@@ -118,19 +124,22 @@ public:
     pixels.Color(255, 255, 255),
   };
 
-  bool NewAnimation;
-
-  char * auth;
+  int mCurrentAnimation;
+  int mPreviousAnimation;
+  
+  int mBreathStatus;
   
 public:
   // Animations
   uint32_t wheel(int);
+  uint32_t getColor(int);
 
   void Solid(uint32_t);
   void Breath(uint32_t);
   void Streak(uint32_t);
   void StreakGPS(uint32_t);
   void ColorWipe(uint32_t);
+  void TheaterChase(uint32_t);
   
   void Rainbow();
   void RainbowStrip();

@@ -2,11 +2,7 @@
 
 Tron::Tron()
 {
-//  LoopVar[iGlobal] = 0;
-//  LoopVar[jGlobal] = 0;
-//  LoopVar[kGlobal] = 0;
-//
-//  NewAnimation = false;
+
 }
 
 Tron::~Tron()
@@ -14,79 +10,78 @@ Tron::~Tron()
   
 }
 
-void Tron::init(int LED_COUNT, int LED_PIN,  int SFX_TX, int SFX_RX, int SFX_RST)
+void Tron::init()
 {
-  Audio_Serial = SoftwareSerial(SFX_TX, SFX_RX);
-  SFX = Adafruit_Soundboard(&Audio_Serial, NULL, SFX_RST);
-
   Audio_Serial.begin(9600);
+  
+  mCurrentAnimation = 0;
+  mPreviousAnimation = -1;
+  
+  mBreathStatus = 0;
 
-  // Set up BLE peripheral for Blynk
-  blePeripheral.setLocalName("TRON_101");
-  blePeripheral.setDeviceName("TRON_101");
-  blePeripheral.setAppearance(384);
-  
-  Blynk.begin(blePeripheral, auth);
-  blePeripheral.begin();
-  
   // Start Neopixel strip
-  pixels = Adafruit_NeoPixel(LED_COUNT, LED_PIN, WS2812_CHIPSET);
   pixels.begin();
   pixels.show();
 }
 
 void Tron::run()
 {  
-  // Poll BLE and run Blynk service
-  blePeripheral.poll();
-  Blynk.run();
-  
   if (Status[Power] == ON)
   {
+	mCurrentAnimation = Status[Animation];
+	if (mPreviousAnimation != mCurrentAnimation)
+	{
+		init_LoopVars();
+		mPreviousAnimation = mCurrentAnimation;
+	}
+	
     switch(Status[Animation])
     {
-      case SOLID:
-        Solid(Color_List[ColorType]);
-        break;
-      case BREATH:
-        Breath(Color_List[ColorType]);
-        break;
-      case RAINBOW:
-        Rainbow();
-        break;  
-      case THEATER_RAINBOW:
-        TheaterChaseRainbow();
-        break;
+    case SOLID:
+      Solid(getColor(Status[ColorType]));
+      break;
+    case BREATH:
+      Breath(getColor(Status[ColorType]));
+      break;
+	  case STREAK:
+	    Streak(getColor(Status[ColorType]));
+		  break;
+	  case STREAKGPS:
+	    StreakGPS(getColor(Status[ColorType]));
+	    break;
+	  case COLORWIPE:
+	    ColorWipe(getColor(Status[ColorType]));
+	    break;
+	  case THEATERCHASE:
+	    TheaterChase(getColor(Status[ColorType]));
+		  break;
+    case RAINBOW:
+      Rainbow();
+      break;
+    case RAINBOWSTRIP:
+	    RainbowStrip();
+		  break;
+	  case RAINBOWBREATH:
+	    RainbowBreath();
+	    break;
+	  case RAINBOWCOLORWIPE:
+	    RainbowColorWipe();
+	    break;
+    case THEATER_RAINBOW:
+      TheaterChaseRainbow();
+      break;
     }
   }
   else
     Solid(Color_List[BLACK_PXL]);
+
+  fps();
 }
 
-void Tron::init_blynk()
-{
-  for(int i = 0; i < STATUS_COUNT; i++)
-  {
-    if (i == Brightness) 
-      Status[i] = DEFAULT_BRIGHT;
-    else if (i == Speed)
-      Status[i] = DEFAULT_FPS;
-    else
-      Status[i] = DEFAULT_VALUE;
-  }
-  
-  Blynk.virtualWrite(V0, Status[Power]);
-  Blynk.virtualWrite(V1, Status[zRed], Status[zGrn], Status[zBlu]);
-  Blynk.virtualWrite(V2, Status[Brightness]);
-  Blynk.virtualWrite(V3, Status[Speed]);
-  Blynk.virtualWrite(V5, Status[Init]);
-  Blynk.virtualWrite(V6, Status[Animation]);
-  Blynk.virtualWrite(V7, Status[ColorType]);
 
-}
-
-void Tron::init_LoopVars(int func)
+void Tron::init_LoopVars()
 {
+  int func = 0;
   if (func == 0)
   {
     LoopVar[iGlobal] = 0;
@@ -95,7 +90,9 @@ void Tron::init_LoopVars(int func)
   }
   else
   {
-
+	LoopVar[iGlobal] = 0;
+    LoopVar[jGlobal] = 0;
+    LoopVar[kGlobal] = 0;
   }
 
 }
@@ -110,37 +107,6 @@ void Tron::fps_alt()
   delay(map(Status[Speed]/10, 1, 10, 10, 1));
 }
 
-void Tron::Solid(uint32_t c)
-{
-  for(uint16_t i = 0; i < pixels.numPixels(); i++) {
-    pixels.setPixelColor(i, c);
-  }
-  pixels.show();
-}
-
-void Tron::Breath(uint32_t c)
-{
-  for(int j = 0; j < 256; j++)
-  {
-    for(uint16_t i = 0; i < pixels.numPixels(); i++) 
-      pixels.setPixelColor(i, c);
-    
-    pixels.show();
-    pixels.setBrightness(j);
-    fps_alt();
-  } 
-  
-  for(int j = 255; j > 0; j--)
-  {
-    for(uint16_t i = 0; i < pixels.numPixels(); i++) 
-      pixels.setPixelColor(i, c);
-    
-    pixels.show();
-    pixels.setBrightness(j);
-    fps_alt();
-  }
-  
-}
 uint32_t Tron::wheel(int pos)
 {
   if (pos < 85) {  
@@ -156,18 +122,91 @@ uint32_t Tron::wheel(int pos)
   } 
 }
 
+uint32_t Tron::getColor(int index)
+{
+  switch(index)
+  {
+    case CUSTOM_PXL : return Color_List[CUSTOM_PXL];
+    case BLACK_PXL  : return Color_List[BLACK_PXL];
+    case RED_PXL    : return Color_List[RED_PXL];
+    case ORANGE_PXL : return Color_List[ORANGE_PXL];
+    case YELLOW_PXL : return Color_List[YELLOW_PXL];
+    case GREEN_PXL  : return Color_List[GREEN_PXL];
+    case CYAN_PXL   : return Color_List[CYAN_PXL];
+    case BLUE_PXL   : return Color_List[BLUE_PXL];
+    case MAGENTA_PXL: return Color_List[MAGENTA_PXL];
+    case PURPLE_PXL : return Color_List[PURPLE_PXL];
+    case WHITE_PXL  : return Color_List[WHITE_PXL];
+    default: return Color_List[BLACK_PXL];
+  }
+}
+
+void Tron::SetStrip(uint32_t c)
+{
+	for(uint16_t i = 0; i < pixels.numPixels(); i++) 
+		pixels.setPixelColor(i, c);
+}
+
+/// Sets the NeoPixel strip one color
+void Tron::Solid(uint32_t c)
+{
+  for(uint16_t i = 0; i < pixels.numPixels(); i++) {
+    pixels.setPixelColor(i, c);
+  }
+  pixels.show();
+}
+
+/// Breath animation with one color. 
+void Tron::Breath(uint32_t c)
+{
+  if (mBreathStatus == 0)
+  {
+	if(LoopVar[iGlobal] < 256)
+	{
+		SetStrip(c);
+    
+		pixels.show();
+		pixels.setBrightness(LoopVar[iGlobal]);
+	
+		LoopVar[iGlobal]++;
+    }
+	else
+	{
+		mBreathStatus = 1;
+		LoopVar[iGlobal]--;
+	}
+  }
+  else if (mBreathStatus == 1)
+  {
+	if(LoopVar[iGlobal] >= 0)
+	{
+		SetStrip(c);
+    
+		pixels.show();
+		pixels.setBrightness(LoopVar[iGlobal]);
+		
+		LoopVar[iGlobal]--;
+	}
+  }  
+}
+
+void Tron::TheaterChase(uint32_t c)
+{
+  for (int i = 0; i < pixels.numPixels(); i++)
+  {
+    
+  }
+}
+
 void Tron::Rainbow()
 {
-  if (NewAnimation)
-    init_LoopVars(0);
-
   if (LoopVar[iGlobal] < 256)
   {
     for (int j = 0; j < pixels.numPixels(); j++)
       pixels.setPixelColor(j, wheel((LoopVar[iGlobal]+j) & 255));
     
     pixels.show();
-    fps_alt();
+    fps();
 
     LoopVar[iGlobal]++;
   }
@@ -255,6 +294,14 @@ void Tron::TheaterChaseRainbow()
 }
 
 void Tron::Streak(uint32_t c)
+{
+  for (int i = 0; i < pixels.numPixels(); i++)
+  {
+    
+  }
+}
+
+void Tron::StreakGPS(uint32_t c)
 {
   for (int i = 0; i < pixels.numPixels(); i++)
   {

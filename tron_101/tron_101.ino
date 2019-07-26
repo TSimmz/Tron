@@ -7,32 +7,33 @@
 //
 //
 //======================================================
-
+#include <BlynkSimpleCurieBLE.h>
+#include <CurieBLE.h>
 #include "tron.h"
 
 //======================================================
 // Adafruit Audio SFX board set up
 
-#define SFX_RX 4
-#define SFX_TX 5
-#define SFX_RST 6
+//#define SFX_RX 4
+//#define SFX_TX 5
+//#define SFX_RST 6
 //======================================================
 
 //======================================================
 // Blynk/BLE set up
 
-//char auth[] = "RhyEuIrXcuzWXikp8Pq2lJlQox1JTkoZ";
+char auth[] = "RhyEuIrXcuzWXikp8Pq2lJlQox1JTkoZ";
 
 //======================================================
 
 //======================================================
 // Adafruit Neopixel set up
-
-#define LED_PIN             7
-#define LED_COUNT           50
+//
+//#define LED_PIN             7
+//#define LED_COUNT           50
 
 //======================================================
-
+BLEPeripheral blePeripheral;
 Tron MyTron = Tron();
 
 //======================================================
@@ -62,7 +63,7 @@ BLYNK_WRITE(V2)
 // Speed slider
 BLYNK_WRITE(V3)
 {
-  MyTron.Status[Speed] = param.asInt();
+  MyTron.Status[Speed] = param.asInt();  
 }
 
 // Initialize button
@@ -71,7 +72,7 @@ BLYNK_WRITE(V5)
   MyTron.Status[Init] = param.asInt();
   if (MyTron.Status[Init])
   {
-    MyTron.init_blynk();
+    init_blynk();
     Blynk.virtualWrite(V5, 0);
   }
 }
@@ -116,7 +117,7 @@ BLYNK_WRITE(V12)
 
 BLYNK_WRITE(V13)
 {
-  //MyTron.Speed = GPS.getSpeed();
+  //MyTron.Status[SpeedGPS]= GPS.getSpeed();
 }
 
 //======================================================
@@ -125,12 +126,50 @@ BLYNK_WRITE(V13)
 void setup()
 {
     Serial.begin(9600);           // Serial monitor
+
+    // Set up BLE peripheral for Blynk
+    blePeripheral.setLocalName("TRON_101");
+    blePeripheral.setDeviceName("TRON_101");
+    blePeripheral.setAppearance(384);
     
-    MyTron.init((int)LED_COUNT, (int)LED_PIN, (int)SFX_TX, (int)SFX_RX, (int)SFX_RST);    
+    Blynk.begin(blePeripheral, auth);
+    blePeripheral.begin();
+    
+    MyTron.init();    
 }
 
 void loop()
 {
+  // Poll BLE and run Blynk service
+  blePeripheral.poll();
+  Blynk.run();
+  
   // Run MyTron
   MyTron.run();
+}
+
+
+void init_blynk()
+{
+  Serial.println("Initializing Blynk..");
+  for(int i = 0; i < STATUS_COUNT; i++)
+  {
+    if (i == Brightness) 
+      MyTron.Status[i] = DEFAULT_BRIGHT;
+    else if (i == Speed)
+      MyTron.Status[i] = DEFAULT_FPS;
+    else
+      MyTron.Status[i] = DEFAULT_VALUE;
+  }
+  
+  Blynk.virtualWrite(V0, MyTron.Status[Power]);
+  Blynk.virtualWrite(V1, MyTron.Status[zRed], MyTron.Status[zGrn], MyTron.Status[zBlu]);
+  Blynk.virtualWrite(V2, MyTron.Status[Brightness]);
+  Blynk.virtualWrite(V3, MyTron.Status[Speed]);
+  Blynk.virtualWrite(V5, MyTron.Status[Init]);
+  Blynk.virtualWrite(V6, MyTron.Status[Animation]);
+  Blynk.virtualWrite(V7, MyTron.Status[ColorType]);
+
+  Serial.println("Complete!");
+
 }
