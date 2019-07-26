@@ -150,9 +150,8 @@ void Tron::SetStrip(uint32_t c)
 /// Sets the NeoPixel strip one color
 void Tron::Solid(uint32_t c)
 {
-  for(uint16_t i = 0; i < pixels.numPixels(); i++) {
-    pixels.setPixelColor(i, c);
-  }
+  SetStrip(c);
+  
   pixels.show();
 }
 
@@ -161,32 +160,35 @@ void Tron::Breath(uint32_t c)
 {
   if (mBreathStatus == 0)
   {
-	if(LoopVar[iGlobal] < 256)
-	{
-		SetStrip(c);
-    
-		pixels.show();
-		pixels.setBrightness(LoopVar[iGlobal]);
-	
-		LoopVar[iGlobal]++;
-    }
-	else
-	{
-		mBreathStatus = 1;
-		LoopVar[iGlobal]--;
-	}
+  	if(LoopVar[iGlobal] < 256)
+  	{
+  		SetStrip(c);
+      
+  		pixels.show();
+  		pixels.setBrightness(LoopVar[iGlobal]);
+  	
+  		LoopVar[iGlobal]++;
+      }
+  	else
+  	{
+  		mBreathStatus = 1;
+  		LoopVar[iGlobal]--;
+  	}
   }
   else if (mBreathStatus == 1)
   {
-	if(LoopVar[iGlobal] >= 0)
-	{
-		SetStrip(c);
-    
-		pixels.show();
-		pixels.setBrightness(LoopVar[iGlobal]);
-		
-		LoopVar[iGlobal]--;
-	}
+  	if(LoopVar[iGlobal] >= 0)
+  	{
+  		SetStrip(c);
+      
+  		pixels.show();
+  		pixels.setBrightness(LoopVar[iGlobal]);
+
+      if (LoopVar[iGlobal] == 0)
+        mBreathStatus = 0;
+      else
+  		  LoopVar[iGlobal]--;
+  	}
   }  
 }
 

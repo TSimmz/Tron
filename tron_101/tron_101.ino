@@ -73,6 +73,7 @@ BLYNK_WRITE(V5)
   if (MyTron.Status[Init])
   {
     init_blynk();
+    MyTron.init_LoopVars();
     Blynk.virtualWrite(V5, 0);
   }
 }
