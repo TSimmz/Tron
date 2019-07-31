@@ -175,7 +175,10 @@ void init_blynk()
   int sync;
 
   sync = ((((double) TRON_WAV_LEN - 2.0) / (double) LED_COUNT) * 1000.0);
-    
+
+  MyTron.SetStrip(MyTron.Color_List[BLACK_PXL]);
+  MyTron.pixels.show();
+  
   for (int i = 0; i < MyTron.pixels.numPixels(); i++)
   {
     MyTron.pixels.setPixelColor(i, MyTron.Color_List[ORANGE_PXL]);
