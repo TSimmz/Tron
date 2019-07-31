@@ -19,6 +19,7 @@ void Tron::init()
   
   mBreathStatus = 0;
   mWipeStatus = 0;
+  mChaseStatus = 0;
 
   // Start Neopixel strip
   pixels.begin();
@@ -83,11 +84,19 @@ void Tron::run()
 void Tron::init_LoopVars()
 {
   int func = 0;
+
+  SetStrip(Color_List[BLACK_PXL]);
+  pixels.show();
+  
   if (func == 0)
   {
     LoopVar[iGlobal] = 0;
     LoopVar[jGlobal] = 0;
     LoopVar[kGlobal] = 0;
+
+    mBreathStatus = 0;
+    mWipeStatus = 0;
+    mChaseStatus = 0;
   }
   else
   {
@@ -285,9 +294,32 @@ void Tron::ColorWipe(uint32_t c)
 
 void Tron::TheaterChase(uint32_t c)
 {
-  for (int i = 0; i < pixels.numPixels(); i++)
+  if (LoopVar[iGlobal] < 3)
   {
-    
+    if (mChaseStatus == 0)
+    {
+      mChaseStatus = 1;
+      
+      for (int j = 0; j < pixels.numPixels(); j+=3)
+      {
+        pixels.setPixelColor(LoopVar[iGlobal] + j, c);
+      }
+      pixels.show();
+    }
+    else
+    {
+      mChaseStatus = 0;
+      for (int j = 0; j < pixels.numPixels(); j+=3)
+      {
+        pixels.setPixelColor(LoopVar[iGlobal] + j, Color_List[BLACK_PXL]);
+      } 
+      
+      LoopVar[iGlobal]++;
+    }
+  }
+  else
+  {
+    LoopVar[iGlobal] = 0;
   }
 }
 
@@ -299,7 +331,6 @@ void Tron::Rainbow()
       pixels.setPixelColor(j, wheel((LoopVar[iGlobal]+j) & 255));
     
     pixels.show();
-    fps();
 
     LoopVar[iGlobal]++;
   }
@@ -368,27 +399,43 @@ void Tron::RainbowColorWipe()
 
 void Tron::TheaterChaseRainbow()
 {
-  for (int i = 0; i < 256; i++)
+  if (LoopVar[iGlobal] < 256)
   {
-    for (int j = 0; j < 3; j++)
+    if (LoopVar[jGlobal] < 3)
     {
-       for (int k = 0; k < pixels.numPixels(); k+=3)
-       {
-           pixels.setPixelColor(j+k, wheel((i+k) % 255));
-       }
-       pixels.show();
-       fps();
-       for (int k = 0; k < pixels.numPixels(); k+=3)
-       {
-           pixels.setPixelColor(j+k, 0);
-       }  
+      if (mChaseStatus == 0)
+      {
+        mChaseStatus = 1;
+        
+        for (int k = 0; k < pixels.numPixels(); k+=3)
+        {
+          pixels.setPixelColor(LoopVar[jGlobal] + k, wheel((LoopVar[iGlobal] + k) % 255));
+        }
+        pixels.show();
+      }
+      else
+      {
+        mChaseStatus = 0;
+        for (int k = 0; k < pixels.numPixels(); k+=3)
+        {
+          pixels.setPixelColor(LoopVar[jGlobal] + k, Color_List[BLACK_PXL]);
+        } 
+        
+        LoopVar[jGlobal]++;
+      }
+    }
+    else
+    {
+      LoopVar[iGlobal]++;
+      LoopVar[jGlobal] = 0;
     }
   }
+  else
+  {
+    LoopVar[iGlobal] = 0;
+    LoopVar[jGlobal] = 0;
+  }
 }
-
-
-
-
 
 void Tron::flushInput() {
   // Read all available serial input to flush pending data.

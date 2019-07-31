@@ -133,6 +133,7 @@ public:
   
   int mBreathStatus;
   int mWipeStatus;
+  int mChaseStatus;
   
 public:
   // Animations
