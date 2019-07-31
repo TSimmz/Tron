@@ -152,25 +152,58 @@ void loop()
 
 void init_blynk()
 {
-  Serial.println("Initializing Blynk..");
-  for(int i = 0; i < STATUS_COUNT; i++)
-  {
-    if (i == Brightness) 
-      MyTron.Status[i] = DEFAULT_BRIGHT;
-    else if (i == Speed)
-      MyTron.Status[i] = DEFAULT_FPS;
-    else
-      MyTron.Status[i] = DEFAULT_VALUE;
-  }
+  MyTron.Status[Power]       = ON;
+  MyTron.Status[Init]        = OFF;
+  MyTron.Status[Animation]   = SOLID;
+  MyTron.Status[ColorType]   = ORANGE_PXL;
+  MyTron.Status[Brightness]  = DEFAULT_BRIGHT;
+  MyTron.Status[Speed]       = DEFAULT_FPS;
+  MyTron.Status[SpeedGPS]    = DEFAULT_VALUE;
+  MyTron.Status[zRed]        = DEFAULT_VALUE;
+  MyTron.Status[zGrn]        = DEFAULT_VALUE;
+  MyTron.Status[zBlu]        = DEFAULT_VALUE;
+  
   
   Blynk.virtualWrite(V0, MyTron.Status[Power]);
   Blynk.virtualWrite(V1, MyTron.Status[zRed], MyTron.Status[zGrn], MyTron.Status[zBlu]);
   Blynk.virtualWrite(V2, MyTron.Status[Brightness]);
   Blynk.virtualWrite(V3, MyTron.Status[Speed]);
   Blynk.virtualWrite(V5, MyTron.Status[Init]);
-  Blynk.virtualWrite(V6, MyTron.Status[Animation]);
-  Blynk.virtualWrite(V7, MyTron.Status[ColorType]);
+  Blynk.virtualWrite(V6, MyTron.Status[Animation] + 1);
+  Blynk.virtualWrite(V7, MyTron.Status[ColorType] + 1);
 
-  Serial.println("Complete!");
+  int sync;
+
+  sync = ((((double) TRON_WAV_LEN - 2.0) / (double) LED_COUNT) * 1000.0);
+    
+  for (int i = 0; i < MyTron.pixels.numPixels(); i++)
+  {
+    MyTron.pixels.setPixelColor(i, MyTron.Color_List[ORANGE_PXL]);
+    MyTron.pixels.show();
+    delay(sync);
+  }
+
+  for (int i = 0; i < 10; i++)
+  {
+    MyTron.SetStrip(MyTron.Color_List[ORANGE_PXL]);
+    MyTron.pixels.show();
+    delay(50);
+    MyTron.SetStrip(MyTron.Color_List[BLACK_PXL]);
+    MyTron.pixels.show();
+    delay(50);
+  }
+
+  MyTron.SetStrip(MyTron.Color_List[ORANGE_PXL]);
+  MyTron.pixels.show();
+  
+  for (int i = 0; i < 256; i++)
+  {
+    MyTron.SetStrip(MyTron.Color_List[ORANGE_PXL]);
+    MyTron.pixels.show();
+    MyTron.pixels.setBrightness(i);
+    delay(4);
+  }
+
+  MyTron.pixels.setBrightness(MyTron.Status[Brightness]);
 
 }

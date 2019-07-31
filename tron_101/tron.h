@@ -12,16 +12,19 @@
 
 #define DEFAULT_BRIGHT    127
 #define DEFAULT_FPS       60
+#define DEFAULT_COLOR     ORANGE_PXL + 1
 
 #define SFX_RX 4
 #define SFX_TX 5
 #define SFX_RST 6
 
 #define LED_PIN             7
-#define LED_COUNT           50
+#define LED_COUNT           30
 
 #define ON  1
 #define OFF 0
+
+#define TRON_WAV_LEN        8
 
 
 
@@ -115,7 +118,7 @@ public:
     pixels.Color(0  , 0  , 0  ),
     pixels.Color(0  , 0  , 0  ),
     pixels.Color(255, 0  , 0  ),
-    pixels.Color(255, 100, 0  ),
+    pixels.Color(255, 30 , 0  ),
     pixels.Color(255, 255, 0  ),
     pixels.Color(0  , 255, 0  ),
     pixels.Color(0  , 255, 255),
