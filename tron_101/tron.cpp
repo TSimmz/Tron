@@ -369,19 +369,26 @@ void Tron::RainbowBreath()
 
 void Tron::RainbowStrip()
 {
-  for (int i = 0; i < 256; i++)
+  if (LoopVar[iGlobal] < 256)
   {
-    for (int j = 0; j < pixels.numPixels(); j++)
+    if (LoopVar[jGlobal] < pixels.numPixels())
     {
-      for (int k = 0; k < pixels.numPixels(); k++)
-        {
-          pixels.setPixelColor(k, wheel((i+j) & 255));
-        }
-    }
-    pixels.show();
-    fps_alt();
-  }
+      SetStrip(wheel((LoopVar[iGlobal] + LoopVar[jGlobal]) & 255));
+      
 
+      LoopVar[jGlobal]++;
+    }
+    else
+    {
+      pixels.show();
+      LoopVar[iGlobal]++;
+      LoopVar[jGlobal] = 0;
+    }
+  }
+  else
+  {
+    LoopVar[iGlobal] = 0;
+  }
 }
 
 void Tron::RainbowColorWipe()
