@@ -146,6 +146,7 @@ uint32_t Tron::getColor(int index)
     case BLUE_PXL   : return Color_List[BLUE_PXL];
     case MAGENTA_PXL: return Color_List[MAGENTA_PXL];
     case PURPLE_PXL : return Color_List[PURPLE_PXL];
+    case PINK_PXL   : return Color_List[PINK _PXL];
     case WHITE_PXL  : return Color_List[WHITE_PXL];
     default: return Color_List[BLACK_PXL];
   }
@@ -401,7 +402,7 @@ void Tron::RainbowColorWipe()
       pixels.show();
       fps_alt();
     }
-  }
+  } 
 }
 
 void Tron::TheaterChaseRainbow()

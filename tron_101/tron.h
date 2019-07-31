@@ -72,6 +72,7 @@ typedef enum
   BLUE_PXL      ,
   MAGENTA_PXL   ,
   PURPLE_PXL    ,
+  PINK_PXL      ,
   WHITE_PXL     ,
   COLOR_COUNT   ,  
 } _Colors;
@@ -125,6 +126,7 @@ public:
     pixels.Color(0  , 0  , 255),
     pixels.Color(255, 0  , 255),
     pixels.Color(127, 0  , 255),
+    pixels.Color(255, 0  , 25 ),
     pixels.Color(255, 255, 255),
   };
 
